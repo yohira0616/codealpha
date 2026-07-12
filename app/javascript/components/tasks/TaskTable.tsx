@@ -17,6 +17,21 @@ export function TaskTable({
 
   return (
     <div className="space-y-3">
+      <div className="flex justify-end gap-6 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm">
+        <div>
+          <span className="text-gray-500">合計人日</span>{" "}
+          <span className="font-semibold tabular-nums">
+            {totalDays.toLocaleString()} 人日
+          </span>
+        </div>
+        <div>
+          <span className="text-gray-500">合計金額</span>{" "}
+          <span className="font-semibold tabular-nums">
+            {totalPrice.toLocaleString()}円
+          </span>
+        </div>
+      </div>
+
       <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
         <table className="w-full text-sm">
           <thead>
@@ -99,21 +114,6 @@ export function TaskTable({
       {updateTask.error && (
         <p className="text-sm text-red-600">{updateTask.error.message}</p>
       )}
-
-      <div className="flex justify-end gap-6 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm">
-        <div>
-          <span className="text-gray-500">合計人日</span>{" "}
-          <span className="font-semibold tabular-nums">
-            {totalDays.toLocaleString()} 人日
-          </span>
-        </div>
-        <div>
-          <span className="text-gray-500">合計金額</span>{" "}
-          <span className="font-semibold tabular-nums">
-            {totalPrice.toLocaleString()}円
-          </span>
-        </div>
-      </div>
     </div>
   );
 }
