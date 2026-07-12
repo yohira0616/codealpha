@@ -44,3 +44,6 @@ node_modules
 
 # TypeScript incremental build info
 *.tsbuildinfo
+
+# IPA一次資料の PDF(大容量バイナリ。アプリは references/*.md のみ参照する)
+/references/pdf/

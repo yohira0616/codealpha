@@ -12,17 +12,14 @@ export function Layout() {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="border-b border-gray-200 bg-white">
-        <nav className="mx-auto flex max-w-4xl items-center gap-2 px-4 py-3">
+        <nav className="mx-auto flex max-w-6xl items-center gap-2 px-4 py-3">
           <span className="mr-4 text-lg font-bold">Codealpha</span>
           <NavLink to="/" end className={navLinkClass}>
-            Home
-          </NavLink>
-          <NavLink to="/about" className={navLinkClass}>
-            About
+            プロジェクト
           </NavLink>
         </nav>
       </header>
-      <main className="mx-auto max-w-4xl px-4 py-8">
+      <main className="mx-auto max-w-6xl px-4 py-8">
         <Outlet />
       </main>
     </div>

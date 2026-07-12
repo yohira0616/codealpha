@@ -6,6 +6,14 @@ Rails.application.routes.draw do
   # REST API(JSON)。コントローラは app/controllers/api/ 配下に置き、Api::BaseController を継承する。
   namespace :api do
     get "health", to: "health#show"
+
+    resources :projects, only: [ :index, :show, :create, :update ] do
+      resources :conversations, only: [ :create ]
+    end
+    resources :conversations, only: [ :show ] do
+      resources :messages, only: [ :create ]
+    end
+    resources :tasks, only: [ :update ]
   end
 
   # React Router 用フォールバック
