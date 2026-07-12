@@ -37,7 +37,7 @@ Rails: namespace :api のコントローラ(Api::BaseController 継承)
 | ビルド | Vite + vite_rails(フロントのソースは `app/javascript`) |
 | CSS | Tailwind CSS v4(`@tailwindcss/vite`、CSS-first 設定) |
 | データ取得 | TanStack Query v5 + zod |
-| テスト | Minitest / tsc / RuboCop |
+| テスト | RSpec(BDD)+ FactoryBot / tsc / RuboCop |
 | デプロイ | Docker + Kamal + Thruster |
 
 ## セットアップ
@@ -57,7 +57,7 @@ bin/dev     # foreman で rails server(:3000)と vite dev(:3036)を同時起動
 ## テスト・検証
 
 ```sh
-bin/rails test      # Rails のテスト
+bin/rspec           # Rails のテスト(RSpec)
 npm run typecheck   # TypeScript 型チェック
 npm run build       # 型チェック + 本番ビルド確認
 bin/rubocop         # Ruby Lint
