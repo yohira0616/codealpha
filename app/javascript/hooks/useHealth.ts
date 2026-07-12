@@ -1,0 +1,9 @@
+import { useQuery } from "@tanstack/react-query";
+
+import { getHealth } from "@/lib/api/health";
+
+export const useHealth = () =>
+  useQuery({
+    queryKey: ["health"],
+    queryFn: getHealth,
+  });

@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+/* Tailwind の自動コンテンツ検出は Vite の root(app/javascript)配下しか見ないため、
+   ERB でも Tailwind クラスを使えるよう app/views を明示的にスキャン対象へ追加する */
+@source "../../views";

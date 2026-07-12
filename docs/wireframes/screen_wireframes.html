@@ -1,0 +1,555 @@
+<title>codealpha 画面ワイヤーフレーム v0.1</title>
+<style>
+  :root {
+    --paper: #f6f6f4;
+    --panel: #ffffff;
+    --ink: #23262b;
+    --ink-2: #5c626b;
+    --wire: #c3c8cf;
+    --wire-soft: #e4e7ea;
+    --fill: #edeff1;
+    --accent: #c8503c;      /* 注釈レッドライン */
+    --accent-ink: #ffffff;
+    --good: #2e7d5b;
+    --warn: #b3872a;
+    --bad: #c0392b;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --sans: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #1b1d21;
+      --panel: #24272c;
+      --ink: #e6e6e2;
+      --ink-2: #9aa0a8;
+      --wire: #4b5158;
+      --wire-soft: #34383e;
+      --fill: #2c3036;
+      --accent: #e06a54;
+      --accent-ink: #1b1d21;
+      --good: #5fbf95;
+      --warn: #d8b25e;
+      --bad: #e0685a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #1b1d21; --panel: #24272c; --ink: #e6e6e2; --ink-2: #9aa0a8;
+    --wire: #4b5158; --wire-soft: #34383e; --fill: #2c3036;
+    --accent: #e06a54; --accent-ink: #1b1d21;
+    --good: #5fbf95; --warn: #d8b25e; --bad: #e0685a;
+  }
+  :root[data-theme="light"] {
+    --paper: #f6f6f4; --panel: #ffffff; --ink: #23262b; --ink-2: #5c626b;
+    --wire: #c3c8cf; --wire-soft: #e4e7ea; --fill: #edeff1;
+    --accent: #c8503c; --accent-ink: #ffffff;
+    --good: #2e7d5b; --warn: #b3872a; --bad: #c0392b;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    line-height: 1.7;
+    margin: 0;
+    padding: 48px 24px 96px;
+  }
+  main { max-width: 1080px; margin: 0 auto; }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: .14em;
+    color: var(--accent);
+    margin: 0 0 8px;
+  }
+  h1 {
+    font-size: 28px;
+    margin: 0 0 4px;
+    text-wrap: balance;
+  }
+  .lede { color: var(--ink-2); margin: 0 0 8px; max-width: 42em; }
+  .meta {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-2);
+    display: flex; flex-wrap: wrap; gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  /* 画面フロー */
+  .flow {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+    padding: 20px;
+    border: 1px solid var(--wire-soft);
+    background: var(--panel);
+    border-radius: 6px;
+    margin-bottom: 56px;
+  }
+  .flow a {
+    font-size: 13px;
+    text-decoration: none;
+    color: var(--ink);
+    border: 1px solid var(--wire);
+    background: var(--fill);
+    border-radius: 4px;
+    padding: 6px 12px;
+    white-space: nowrap;
+  }
+  .flow a:hover, .flow a:focus-visible { border-color: var(--accent); outline: none; }
+  .flow .arrow { color: var(--ink-2); font-size: 13px; }
+  .flow .phase2 { border-style: dashed; color: var(--ink-2); }
+  .flow .flow-note { font-size: 12px; color: var(--ink-2); margin-left: auto; }
+
+  /* セクション */
+  section { margin-bottom: 72px; }
+  .sec-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px; }
+  .sec-no {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--accent);
+  }
+  h2 { font-size: 20px; margin: 0; }
+  .purpose { color: var(--ink-2); margin: 0 0 20px; font-size: 14px; max-width: 46em; }
+
+  .board {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 24px;
+    align-items: start;
+  }
+  @media (max-width: 860px) { .board { grid-template-columns: 1fr; } }
+
+  /* ワイヤーフレーム キャンバス */
+  .wf {
+    background: var(--panel);
+    border: 1px solid var(--wire);
+    border-radius: 6px;
+    padding: 14px;
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: var(--ink-2);
+    overflow-x: auto;
+  }
+  .wf, .wf * { box-sizing: border-box; }
+  .wf .inner { min-width: 560px; display: flex; flex-direction: column; gap: 10px; }
+
+  .topbar {
+    display: flex; align-items: center; gap: 10px;
+    border: 1px solid var(--wire);
+    border-radius: 4px;
+    padding: 8px 10px;
+    background: var(--fill);
+  }
+  .logo { font-family: var(--mono); font-weight: 700; color: var(--ink); font-size: 11px; }
+  .navlink { padding: 2px 8px; border-radius: 3px; }
+  .navlink.on { background: var(--wire-soft); color: var(--ink); border: 1px solid var(--wire); }
+  .spacer { flex: 1; }
+
+  .row { display: flex; gap: 10px; align-items: stretch; }
+  .col { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .grow { flex: 1; }
+
+  .box {
+    border: 1px solid var(--wire);
+    border-radius: 4px;
+    padding: 10px;
+    background: var(--panel);
+    position: relative;
+  }
+  .box.ghost { border-style: dashed; background: transparent; }
+  .box-title { font-weight: 700; color: var(--ink); font-size: 11px; margin-bottom: 6px; }
+
+  .bar { height: 8px; border-radius: 2px; background: var(--fill); margin: 6px 0; }
+  .bar.w40 { width: 40%; } .bar.w60 { width: 60%; } .bar.w80 { width: 80%; }
+
+  .btn {
+    display: inline-block;
+    border: 1px solid var(--ink-2);
+    color: var(--ink);
+    border-radius: 4px;
+    padding: 4px 12px;
+    font-size: 11px;
+    background: var(--fill);
+    white-space: nowrap;
+  }
+  .btn.primary { background: var(--ink); color: var(--panel); border-color: var(--ink); }
+
+  .tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    border: 1px solid var(--wire);
+    border-radius: 999px;
+    padding: 1px 8px;
+    background: var(--fill);
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+  .tag.good { color: var(--good); border-color: var(--good); background: transparent; }
+  .tag.warn { color: var(--warn); border-color: var(--warn); background: transparent; }
+  .tag.bad  { color: var(--bad);  border-color: var(--bad);  background: transparent; }
+
+  table.wt { border-collapse: collapse; width: 100%; font-size: 11px; }
+  table.wt th, table.wt td {
+    border: 1px solid var(--wire-soft);
+    padding: 5px 8px;
+    text-align: left;
+    white-space: nowrap;
+  }
+  table.wt th { background: var(--fill); color: var(--ink); font-weight: 600; }
+  table.wt td.num { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--mono); }
+
+  .field {
+    border: 1px solid var(--wire);
+    border-radius: 4px;
+    padding: 6px 8px;
+    background: var(--panel);
+    color: var(--ink-2);
+  }
+  .field.area { min-height: 72px; }
+  .label { font-size: 10px; color: var(--ink-2); margin-bottom: 2px; }
+
+  .bignum { font-family: var(--mono); font-size: 18px; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .range-track {
+    position: relative; height: 6px; border-radius: 3px;
+    background: var(--wire-soft); margin: 10px 0 4px;
+  }
+  .range-fill { position: absolute; top: 0; bottom: 0; border-radius: 3px; background: var(--wire); }
+  .range-dot {
+    position: absolute; top: -3px; width: 12px; height: 12px; border-radius: 50%;
+    background: var(--ink); border: 2px solid var(--panel);
+  }
+
+  .alert {
+    border: 1px solid var(--bad);
+    border-left-width: 4px;
+    border-radius: 4px;
+    padding: 8px 10px;
+    color: var(--bad);
+    background: transparent;
+    font-size: 11px;
+  }
+
+  /* 注釈ピン */
+  .pin {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    flex: none;
+  }
+  .pin.abs { position: absolute; top: -9px; right: -6px; }
+
+  .notes { display: flex; flex-direction: column; gap: 14px; font-size: 13px; }
+  .note { display: flex; gap: 10px; align-items: flex-start; }
+  .note .pin { margin-top: 3px; }
+  .note b { color: var(--ink); }
+  .note p { margin: 2px 0 0; color: var(--ink-2); }
+  .notes-title {
+    font-family: var(--mono); font-size: 11px; letter-spacing: .12em;
+    color: var(--ink-2); margin: 0 0 2px;
+  }
+
+  .open-q {
+    border: 1px dashed var(--wire);
+    border-radius: 6px;
+    padding: 20px 24px;
+    background: var(--panel);
+  }
+  .open-q h2 { font-size: 16px; margin-bottom: 8px; }
+  .open-q ul { margin: 8px 0 0; padding-left: 20px; color: var(--ink-2); font-size: 14px; }
+  .open-q li { margin-bottom: 6px; }
+</style>
+
+<main>
+  <p class="eyebrow">CODEALPHA / WIREFRAME v0.1</p>
+  <h1>見積もり・採算管理基盤 画面ワイヤーフレーム</h1>
+  <p class="lede">MVP Phase 1(受注前見積もり)の6画面と、差別化の核である与実レポート画面のたたき台。低忠実度ワイヤーのため、配色・装飾は含まない。</p>
+  <div class="meta">
+    <span>2026-07-12</span>
+    <span>参照: docs/ai_development_estimation_profit_platform.md</span>
+    <span>参照: docs/estimation_meeting_minutes_20260711.md</span>
+  </div>
+
+  <div class="flow">
+    <a href="#s1">1 案件一覧</a><span class="arrow">→</span>
+    <a href="#s2">2 要件投入</a><span class="arrow">→</span>
+    <a href="#s3">3 機能分解</a><span class="arrow">→</span>
+    <a href="#s4">4 非機能要件</a><span class="arrow">→</span>
+    <a href="#s5">5 見積もり結果</a><span class="arrow">→</span>
+    <a href="#s6">6 提案書出力</a><span class="arrow">⇢</span>
+    <a href="#s7" class="phase2">7 与実レポート(受注後)</a>
+    <span class="flow-note">⇢ は受注後フェーズへの遷移</span>
+  </div>
+
+  <!-- 1. 案件一覧 -->
+  <section id="s1">
+    <div class="sec-head"><span class="sec-no">SCREEN 01</span><h2>案件(見積もり)一覧</h2></div>
+    <p class="purpose">入口となるホーム。見積もり中〜受注後の案件を粗利率と一緒に一覧し、採算の悪い案件が一目で分かる状態にする。</p>
+    <div class="board">
+      <div class="wf"><div class="inner">
+        <div class="topbar">
+          <span class="logo">codealpha</span>
+          <span class="navlink on">案件</span>
+          <span class="navlink">標準工数テーブル</span>
+          <span class="navlink">設定</span>
+          <span class="spacer"></span>
+          <span class="btn primary">+ 新規見積もり<span class="pin abs">1</span></span>
+        </div>
+        <div class="row">
+          <span class="field">検索…</span>
+          <span class="tag">状態: すべて ▾</span>
+          <span class="tag">下書き</span>
+          <span class="tag">提案済み</span>
+          <span class="tag">受注</span>
+          <span class="tag">クローズ</span>
+        </div>
+        <div class="box" style="padding:0">
+          <table class="wt">
+            <tr><th>案件名</th><th>顧客</th><th>状態</th><th>推奨受注価格</th><th>想定粗利率<span class="pin" style="margin-left:6px">2</span></th><th>更新日</th></tr>
+            <tr><td>受発注管理システム</td><td>A社</td><td><span class="tag">提案済み</span></td><td class="num">1,800〜2,200万</td><td class="num"><span class="tag good">58%</span></td><td class="num">07/10</td></tr>
+            <tr><td>予約サイト改修</td><td>B社</td><td><span class="tag">下書き</span></td><td class="num">380〜450万</td><td class="num"><span class="tag warn">42%</span></td><td class="num">07/08</td></tr>
+            <tr><td>基幹連携バッチ</td><td>C社</td><td><span class="tag">受注</span></td><td class="num">920万</td><td class="num"><span class="tag bad">36% ⚠</span></td><td class="num">07/01</td></tr>
+          </table>
+        </div>
+      </div></div>
+      <div class="notes">
+        <p class="notes-title">ANNOTATIONS</p>
+        <div class="note"><span class="pin">1</span><div><b>新規見積もり</b><p>主動線はここだけ。ダッシュボード的な集計は後回しにし、一覧＋作成に絞る。</p></div></div>
+        <div class="note"><span class="pin">2</span><div><b>粗利率を一覧に常設</b><p>利益率ガード(下限40%)を切る案件は一覧の時点で警告表示。個別画面を開かないと気づけない状態を避ける。</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. 要件投入 -->
+  <section id="s2">
+    <div class="sec-head"><span class="sec-no">SCREEN 02</span><h2>新規見積もり — 要件投入</h2></div>
+    <p class="purpose">提案書・ヒアリングメモなどの生テキストを投入し、AIによる機能分解の入力とする。ここでは整形を求めない。</p>
+    <div class="board">
+      <div class="wf"><div class="inner">
+        <div class="topbar"><span class="logo">codealpha</span><span class="navlink">← 案件一覧</span><span class="spacer"></span><span class="tag">STEP 1/4 要件投入</span></div>
+        <div class="row">
+          <div class="col grow">
+            <div class="box">
+              <div class="box-title">案件情報</div>
+              <div class="label">案件名</div><div class="field">受発注管理システム</div>
+              <div class="label" style="margin-top:6px">顧客名 / 業種</div><div class="field">A社 / 卸売</div>
+            </div>
+            <div class="box">
+              <div class="box-title">要件テキスト <span class="pin" style="margin-left:6px">1</span></div>
+              <div class="field area">提案書・議事録・ヒアリングメモを貼り付け<br>(ファイル添付: PDF / Markdown / docx)</div>
+              <div class="bar w60"></div><div class="bar w80"></div><div class="bar w40"></div>
+            </div>
+          </div>
+          <div class="col" style="width:190px">
+            <div class="box ghost">
+              <div class="box-title">現状業務コスト(任意) <span class="pin" style="margin-left:6px">2</span></div>
+              <div class="label">手作業の人件費 / 月</div><div class="field">—</div>
+              <div class="label" style="margin-top:6px">既存システム利用料 / 月</div><div class="field">—</div>
+              <div class="label" style="margin-top:6px">その他損失</div><div class="field">—</div>
+            </div>
+            <span class="btn primary" style="text-align:center">機能分解を実行 →</span>
+          </div>
+        </div>
+      </div></div>
+      <div class="notes">
+        <p class="notes-title">ANNOTATIONS</p>
+        <div class="note"><span class="pin">1</span><div><b>生テキストのまま投入</b><p>構造化フォームにしない。入力ハードルを下げ、AIが機能抽出・分解を担う。</p></div></div>
+        <div class="note"><span class="pin">2</span><div><b>顧客の経済効果の材料</b><p>顧客価値プライシング用。任意入力とし、空でも見積もりは進められる。入力があれば結果画面で投資回収期間を出す。</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 機能分解 -->
+  <section id="s3">
+    <div class="sec-head"><span class="sec-no">SCREEN 03</span><h2>機能分解(WBS)の確認・編集</h2></div>
+    <p class="purpose">AIが生成した機能一覧を人間がレビューする画面。カテゴリタグと規模が標準工数テーブルの参照キーになるため、ここの精度が見積もり全体を決める。</p>
+    <div class="board">
+      <div class="wf"><div class="inner">
+        <div class="topbar"><span class="logo">codealpha</span><span class="navlink">← 要件投入</span><span class="spacer"></span><span class="tag">STEP 2/4 機能分解</span></div>
+        <div class="box" style="padding:0">
+          <table class="wt">
+            <tr><th></th><th>機能</th><th>カテゴリ<span class="pin" style="margin-left:6px">1</span></th><th>規模</th><th>標準工数(人日)</th><th>根拠<span class="pin" style="margin-left:6px">2</span></th></tr>
+            <tr><td>☑</td><td>ログイン・権限管理</td><td><span class="tag">認証</span></td><td>M</td><td class="num">8.0</td><td>📄</td></tr>
+            <tr><td>☑</td><td>受注登録・編集</td><td><span class="tag">CRUD</span></td><td>L</td><td class="num">12.0</td><td>📄</td></tr>
+            <tr><td>☑</td><td>在庫API連携</td><td><span class="tag">外部API連携</span></td><td>M</td><td class="num">10.0</td><td>📄</td></tr>
+            <tr><td>☑</td><td>月次集計バッチ</td><td><span class="tag">バッチ</span></td><td>S</td><td class="num">4.0</td><td>📄</td></tr>
+            <tr><td>☐</td><td>CSV出力 <span class="tag warn">要確認</span> <span class="pin" style="margin-left:4px">3</span></td><td><span class="tag">帳票</span></td><td>S</td><td class="num">3.0</td><td>📄</td></tr>
+          </table>
+        </div>
+        <div class="row">
+          <span class="btn">+ 機能を追加</span>
+          <span class="tag">検出漏れの指摘: 「パスワード再発行が見当たりません」</span>
+          <span class="spacer"></span>
+          <span class="btn primary">非機能要件へ →</span>
+        </div>
+      </div></div>
+      <div class="notes">
+        <p class="notes-title">ANNOTATIONS</p>
+        <div class="note"><span class="pin">1</span><div><b>カテゴリ=テーブルの参照キー</b><p>認証 / CRUD / 外部API連携 / 決済 / 管理画面…。カテゴリ別標準工数テーブルの行に対応し、編集するとその場で工数が再計算される。</p></div></div>
+        <div class="note"><span class="pin">2</span><div><b>根拠の追跡</b><p>クリックで元テキストの該当箇所を表示。「なぜこの機能が入ったか」を顧客に説明できる状態を保つ。</p></div></div>
+        <div class="note"><span class="pin">3</span><div><b>確度の低い項目を明示</b><p>AIの推測で補った機能は「要確認」で区別し、チェックを外せばスコープから除外できる。</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. 非機能要件 -->
+  <section id="s4">
+    <div class="sec-head"><span class="sec-no">SCREEN 04</span><h2>非機能要件・システムグレード</h2></div>
+    <p class="purpose">顧客が言及しない非機能要件をグレード選択で自動補完し、見積もりへの影響額を可視化する。</p>
+    <div class="board">
+      <div class="wf"><div class="inner">
+        <div class="topbar"><span class="logo">codealpha</span><span class="navlink">← 機能分解</span><span class="spacer"></span><span class="tag">STEP 3/4 非機能要件</span></div>
+        <div class="row">
+          <div class="box grow"><div class="box-title">Grade 1<br>PoC・試作品</div><div class="bar w80"></div><div class="bar w60"></div></div>
+          <div class="box grow" style="border-width:2px;border-color:var(--ink)"><div class="box-title">Grade 2 ✓ <span class="pin" style="margin-left:4px">1</span><br>社内業務システム</div><div class="bar w80"></div><div class="bar w60"></div></div>
+          <div class="box grow"><div class="box-title">Grade 3<br>顧客向けサービス</div><div class="bar w80"></div><div class="bar w60"></div></div>
+          <div class="box grow"><div class="box-title">Grade 4<br>重要業務・規制領域</div><div class="bar w80"></div><div class="bar w60"></div></div>
+        </div>
+        <div class="box" style="padding:0">
+          <table class="wt">
+            <tr><th>項目</th><th>推奨値(Grade 2)</th><th>個別調整</th><th>工数影響<span class="pin" style="margin-left:6px">2</span></th></tr>
+            <tr><td>バックアップ / RPO・RTO</td><td>日次 / 24h・8h</td><td>▾</td><td class="num">+0.5人日</td></tr>
+            <tr><td>監視・ログ</td><td>操作ログ・エラー監視</td><td>▾</td><td class="num">+3.0人日</td></tr>
+            <tr><td>CI/CD・環境</td><td>CI + ステージング</td><td>▾</td><td class="num">+2.5人日</td></tr>
+            <tr><td>セキュリティ</td><td>脆弱性対策 標準セット</td><td>▾</td><td class="num">+4.0人日</td></tr>
+          </table>
+        </div>
+        <div class="row"><span class="spacer"></span><span class="tag">非機能要件計 +10.0人日</span><span class="btn primary">見積もり結果へ →</span></div>
+      </div></div>
+      <div class="notes">
+        <p class="notes-title">ANNOTATIONS</p>
+        <div class="note"><span class="pin">1</span><div><b>グレードは推奨値プリセット</b><p>業種・利用者・データ特性からAIが初期選択。個別項目は上書き可能だが、既定では触らずに進める想定。</p></div></div>
+        <div class="note"><span class="pin">2</span><div><b>非機能の影響額を明示</b><p>「なぜ基本機能より高いのか」への説明材料。提案書にもこの内訳がそのまま載る。</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. 見積もり結果 -->
+  <section id="s5">
+    <div class="sec-head"><span class="sec-no">SCREEN 05</span><h2>見積もり結果 — 三つの見積もりと利益率ガード</h2></div>
+    <p class="purpose">本プロダクトの中核画面。市場標準・自社実行・推奨受注価格を並べ、粗利率と警告を必ず表示する。</p>
+    <div class="board">
+      <div class="wf"><div class="inner">
+        <div class="topbar"><span class="logo">codealpha</span><span class="navlink">← 非機能要件</span><span class="spacer"></span><span class="tag">STEP 4/4 見積もり結果</span></div>
+        <div class="row">
+          <div class="box grow"><div class="box-title">市場標準見積もり <span class="pin" style="margin-left:4px">1</span></div>
+            <div class="bignum">18.0人月</div>
+            <div>2,000〜2,500万円 / 6〜9か月</div>
+          </div>
+          <div class="box grow"><div class="box-title">自社実行見積もり(社外秘)</div>
+            <div class="bignum">7.5人月</div>
+            <div>予測原価 850万円 / 3〜4か月</div>
+          </div>
+          <div class="box grow" style="border-width:2px;border-color:var(--ink)"><div class="box-title">推奨受注価格</div>
+            <div class="bignum">1,800〜2,200万円</div>
+            <div>想定粗利率 <b>58%</b> <span class="tag good">OK</span> <span class="pin" style="margin-left:4px">2</span></div>
+          </div>
+        </div>
+        <div class="box">
+          <div class="box-title">工数レンジ(楽観 9.5 / 標準 12.5 / 慎重 16.0 人月)</div>
+          <div class="range-track"><div class="range-fill" style="left:18%;right:22%"></div><div class="range-dot" style="left:44%"></div></div>
+        </div>
+        <div class="row">
+          <div class="box grow"><div class="box-title">見積もりを押し上げる要因 <span class="pin" style="margin-left:4px">3</span></div>
+            <table class="wt">
+              <tr><td>既存システム仕様が不明</td><td class="num">+15〜25%</td></tr>
+              <tr><td>データ移行品質が未確認</td><td class="num">+5〜15%</td></tr>
+              <tr><td>承認者が未確定</td><td class="num">+5〜10%</td></tr>
+            </table>
+          </div>
+          <div class="col" style="width:210px">
+            <div class="alert">⚠ 想定売価を1,400万円未満にすると粗利率40%を下回ります</div>
+            <div class="box ghost"><div class="box-title">顧客の経済効果</div>年間削減 1,800万円<br>投資回収 8〜10か月</div>
+          </div>
+        </div>
+        <div class="row"><span class="btn">機能分解へ戻る</span><span class="spacer"></span><span class="btn">再計算</span><span class="btn primary">提案書を出力 →</span></div>
+      </div></div>
+      <div class="notes">
+        <p class="notes-title">ANNOTATIONS</p>
+        <div class="note"><span class="pin">1</span><div><b>価格は常に標準係数1.0</b><p>担当者係数(例: 大平=0.4)は自社実行見積もりの内部変数で、市場標準・受注価格には一切反映しない。自社実行カードには「社外秘」を常時表示。</p></div></div>
+        <div class="note"><span class="pin">2</span><div><b>利益率ガード</b><p>粗利率は必ず表示。下限40%を切る売価をシミュレートすると即時に警告が出る。</p></div></div>
+        <div class="note"><span class="pin">3</span><div><b>レンジ+前提条件で提示</b><p>一点見積もりを出さない。「この前提が崩れると+30%」を価格交渉の防御線として画面と提案書の両方に載せる。</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. 提案書出力 -->
+  <section id="s6">
+    <div class="sec-head"><span class="sec-no">SCREEN 06</span><h2>提案書出力プレビュー</h2></div>
+    <p class="purpose">顧客向けドキュメントの生成。社外秘情報(自社原価・担当者係数)が混入しないことをここで保証する。</p>
+    <div class="board">
+      <div class="wf"><div class="inner">
+        <div class="topbar"><span class="logo">codealpha</span><span class="navlink">← 見積もり結果</span><span class="spacer"></span><span class="btn">Markdown</span><span class="btn primary">PDF出力</span></div>
+        <div class="row">
+          <div class="col" style="width:170px">
+            <div class="box"><div class="box-title">含めるセクション</div>
+              ☑ 課題と経済効果<br>☑ 機能一覧<br>☑ 非機能要件<br>☑ 価格とレンジ<br>☑ 前提条件・リスク<br>☐ 体制図
+            </div>
+            <div class="box ghost"><div class="box-title">契約構造 <span class="pin" style="margin-left:4px">2</span></div>要件定義: 準委任<br>開発: 請負(固定)</div>
+          </div>
+          <div class="box grow">
+            <div class="box-title">プレビュー <span class="pin" style="margin-left:4px">1</span></div>
+            <div class="bar w40"></div><div class="bar w80"></div><div class="bar w80"></div><div class="bar w60"></div>
+            <div class="bar w80"></div><div class="bar w40"></div><div class="bar w60"></div><div class="bar w80"></div>
+            <div class="tag good" style="margin-top:8px">✓ 社外秘情報は含まれていません</div>
+          </div>
+        </div>
+      </div></div>
+      <div class="notes">
+        <p class="notes-title">ANNOTATIONS</p>
+        <div class="note"><span class="pin">1</span><div><b>社外秘チェック</b><p>自社実行工数・原価・担当者係数が出力に含まれないことを生成時に機械チェックし、通過を明示する。</p></div></div>
+        <div class="note"><span class="pin">2</span><div><b>契約構造を提案書に組み込む</b><p>「要件定義=準委任、開発=請負」の2段構造を提案書テンプレートの標準とする(経産省・IPAモデル契約準拠として説明)。</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. 与実レポート -->
+  <section id="s7">
+    <div class="sec-head"><span class="sec-no">SCREEN 07</span><h2>与実レポート(受注後・Phase 2以降)</h2></div>
+    <p class="purpose">案件クローズ時に見積 vs 実績の乖離を機能単位で表示し、標準工数テーブルへの補正を提案する。GEAR.indigoにない最大の差別化点。</p>
+    <div class="board">
+      <div class="wf"><div class="inner">
+        <div class="topbar"><span class="logo">codealpha</span><span class="navlink">← 案件詳細</span><span class="spacer"></span><span class="tag">案件クローズレポート</span></div>
+        <div class="row">
+          <div class="box grow"><div class="box-title">標準比生産性</div><div class="bignum">2.03倍</div></div>
+          <div class="box grow"><div class="box-title">粗利益</div><div class="bignum">1,420万円</div><div>粗利率 59.2%</div></div>
+          <div class="box grow"><div class="box-title">実工数入力 <span class="pin" style="margin-left:4px">1</span></div>機能完了時に半日単位<br>+ 担当者のみ記録</div>
+        </div>
+        <div class="box" style="padding:0">
+          <table class="wt">
+            <tr><th>機能</th><th>カテゴリ</th><th>標準</th><th>自社予測</th><th>実績</th><th>乖離</th></tr>
+            <tr><td>認証・権限</td><td><span class="tag">認証</span></td><td class="num">180h</td><td class="num">100h</td><td class="num">82h</td><td class="num"><span class="tag good">-18%</span></td></tr>
+            <tr><td>商品管理</td><td><span class="tag">CRUD</span></td><td class="num">320h</td><td class="num">180h</td><td class="num">195h</td><td class="num"><span class="tag warn">+8%</span></td></tr>
+            <tr><td>決済</td><td><span class="tag">決済</span></td><td class="num">240h</td><td class="num">160h</td><td class="num">145h</td><td class="num"><span class="tag good">-9%</span></td></tr>
+          </table>
+        </div>
+        <div class="box ghost">
+          <div class="box-title">テーブル補正の提案 <span class="pin" style="margin-left:4px">2</span></div>
+          「CRUD カテゴリの自社係数を 0.55 → 0.60 に補正することを提案します(直近3案件で予測超過)」
+          <div style="margin-top:6px"><span class="btn">採用してテーブル更新</span> <span class="btn">見送る</span></div>
+        </div>
+      </div></div>
+      <div class="notes">
+        <p class="notes-title">ANNOTATIONS</p>
+        <div class="note"><span class="pin">1</span><div><b>記録は機能単位・半日単位</b><p>日次工数入力は設けない(続かないため)。将来はGitHub連携で自動推定に置き換える余地を残す。</p></div></div>
+        <div class="note"><span class="pin">2</span><div><b>フィードバックループの着地点</b><p>乖離を見せるだけでなく、標準工数テーブルへの具体的な補正案として提示し、ワンクリックで会社の資産(テーブル)に還元する。</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="open-q">
+    <h2>ワイヤー確定前に決めたいこと</h2>
+    <ul>
+      <li>STEP 2〜4 をウィザード形式(現案)にするか、1画面のタブ切り替えにするか</li>
+      <li>「標準工数テーブル」管理画面(カテゴリ×規模のマトリクス編集)を Phase 1 に含めるか</li>
+      <li>自社実行見積もりの表示権限 — 全員に見せるか、ロールで隠すか</li>
+      <li>与実レポート(SCREEN 07)を MVP に入れるか、まず手動運用(台帳TSV)で代替するか</li>
+    </ul>
+  </div>
+</main>

@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+
+if ! gem list foreman -i --silent; then
+  echo "Installing foreman..."
+  gem install foreman
+fi
+
+# foreman は Procfile の1番目のプロセス(web)に PORT を割り当てる。
+# vite のポートは config/vite.json(3036)で決まるため PORT の影響を受けない。
+export PORT="${PORT:-3000}"
+
+exec foreman start -f Procfile.dev "$@"
