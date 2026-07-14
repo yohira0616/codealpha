@@ -27,6 +27,8 @@ export const projectSchema = z.object({
   status: z.string(),
   total_estimated_days: z.number(),
   total_estimated_price: z.number(),
+  in_scope_estimated_days: z.number(),
+  in_scope_estimated_price: z.number(),
   tasks: z.array(taskSchema),
   conversations: z.array(conversationSummarySchema),
 });

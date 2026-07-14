@@ -2,34 +2,47 @@ import { useState } from "react";
 
 import { useUpdateTask } from "@/hooks/useUpdateTask";
 import { cn } from "@/lib/utils";
-import type { Task } from "@/types/task";
+import { SCOPE_OUT_TAG, type Task } from "@/types/task";
 
 export function TaskTable({
   tasks,
   totalDays,
   totalPrice,
+  inScopeDays,
+  inScopePrice,
 }: {
   tasks: Task[];
   totalDays: number;
   totalPrice: number;
+  inScopeDays: number;
+  inScopePrice: number;
 }) {
   const updateTask = useUpdateTask();
+  const hasScopeOut = totalDays !== inScopeDays || totalPrice !== inScopePrice;
 
   return (
     <div className="space-y-3">
-      <div className="flex justify-end gap-6 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm">
+      <div className="flex flex-wrap items-baseline justify-end gap-x-6 gap-y-1 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm">
         <div>
-          <span className="text-gray-500">合計人日</span>{" "}
+          <span className="text-gray-500">
+            {hasScopeOut ? "初期スコープ" : "合計"}
+          </span>{" "}
           <span className="font-semibold tabular-nums">
-            {totalDays.toLocaleString()} 人日
+            {inScopeDays.toLocaleString()} 人日
+          </span>{" "}
+          <span className="font-semibold tabular-nums">
+            / {inScopePrice.toLocaleString()}円
           </span>
         </div>
-        <div>
-          <span className="text-gray-500">合計金額</span>{" "}
-          <span className="font-semibold tabular-nums">
-            {totalPrice.toLocaleString()}円
-          </span>
-        </div>
+        {hasScopeOut && (
+          <div className="text-xs text-gray-400">
+            全量(スコープ外含む){" "}
+            <span className="tabular-nums">
+              {totalDays.toLocaleString()} 人日 / {totalPrice.toLocaleString()}
+              円
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
@@ -52,7 +65,13 @@ export function TaskTable({
               </tr>
             )}
             {tasks.map((task) => (
-              <tr key={task.id} className="border-b border-gray-100 last:border-b-0">
+              <tr
+                key={task.id}
+                className={cn(
+                  "border-b border-gray-100 last:border-b-0",
+                  !task.tags.includes(SCOPE_OUT_TAG) || "opacity-50"
+                )}
+              >
                 <td className="px-3 py-2">
                   <div className="font-medium text-gray-900">{task.title}</div>
                   {task.description && (
@@ -60,6 +79,12 @@ export function TaskTable({
                       {task.description}
                     </div>
                   )}
+                  <EditableTags
+                    tags={task.tags}
+                    onSave={(tags) =>
+                      updateTask.mutate({ id: task.id, params: { tags } })
+                    }
+                  />
                 </td>
                 <td className="px-3 py-2">
                   {task.category ? (
@@ -115,6 +140,81 @@ export function TaskTable({
         <p className="text-sm text-red-600">{updateTask.error.message}</p>
       )}
     </div>
+  );
+}
+
+// タグのチップ表示。クリックでカンマ区切りの入力に切り替えて編集する
+function EditableTags({
+  tags,
+  onSave,
+}: {
+  tags: string[];
+  onSave: (tags: string[]) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState("");
+
+  const startEditing = () => {
+    setDraft(tags.join(", "));
+    setEditing(true);
+  };
+
+  const commit = () => {
+    setEditing(false);
+    const parsed = [
+      ...new Set(
+        draft
+          .split(/[,、]/)
+          .map((t) => t.trim())
+          .filter((t) => t !== "")
+      ),
+    ];
+    if (parsed.join("\n") === tags.join("\n")) return;
+    onSave(parsed);
+  };
+
+  if (editing) {
+    return (
+      <input
+        autoFocus
+        type="text"
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onBlur={commit}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") e.currentTarget.blur();
+          if (e.key === "Escape") setEditing(false);
+        }}
+        placeholder="カンマ区切りでタグを入力"
+        className="mt-1 w-full rounded-md border border-blue-400 px-2 py-0.5 text-xs focus:outline-none"
+      />
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={startEditing}
+      title="クリックでタグを編集"
+      className="mt-1 flex flex-wrap items-center gap-1 rounded-md text-left hover:bg-blue-50"
+    >
+      {tags.length === 0 && (
+        <span className="text-xs text-gray-300">+ タグ</span>
+      )}
+      {tags.map((tag) => (
+        <span
+          key={tag}
+          className={cn(
+            "inline-block rounded-full px-2 py-0.5 text-xs",
+            tag === SCOPE_OUT_TAG
+              ? "bg-red-50 text-red-700 ring-1 ring-red-200"
+              : "bg-blue-50 text-blue-700"
+          )}
+        >
+          {tag}
+        </span>
+      ))}
+    </button>
   );
 }
 

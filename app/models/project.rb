@@ -14,4 +14,14 @@ class Project < ApplicationRecord
   def total_estimated_price
     tasks.sum { |t| t.estimated_price.to_i }
   end
+
+  # 初期スコープ(「スコープ外」タグ付きを除く)の合計人日
+  def in_scope_estimated_days
+    tasks.select(&:in_scope?).sum(0.0) { |t| t.estimated_days.to_f }
+  end
+
+  # 初期スコープの合計金額
+  def in_scope_estimated_price
+    tasks.select(&:in_scope?).sum { |t| t.estimated_price.to_i }
+  end
 end

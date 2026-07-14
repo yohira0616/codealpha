@@ -14,7 +14,8 @@ module Api
         estimated_days: task.estimated_days&.to_f,
         estimated_price: task.estimated_price,
         estimated_by: task.estimated_by,
-        position: task.position
+        position: task.position,
+        tags: task.tags
       }
     end
 
@@ -58,6 +59,8 @@ module Api
         status: project.status,
         total_estimated_days: project.total_estimated_days,
         total_estimated_price: project.total_estimated_price,
+        in_scope_estimated_days: project.in_scope_estimated_days,
+        in_scope_estimated_price: project.in_scope_estimated_price,
         tasks: project.tasks.order(:position, :id).map { |t| task_json(t) },
         conversations: project.conversations.order(:id).map { |c| conversation_summary_json(c) }
       }

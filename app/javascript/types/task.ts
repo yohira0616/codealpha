@@ -12,6 +12,10 @@ export const taskSchema = z.object({
   estimated_price: z.number().nullable(),
   estimated_by: z.enum(["llm", "user"]),
   position: z.number().nullable(),
+  tags: z.array(z.string()),
 });
+
+// 予約タグ: 付いたタスクは初期スコープの合計から除外される
+export const SCOPE_OUT_TAG = "スコープ外";
 
 export type Task = z.infer<typeof taskSchema>;

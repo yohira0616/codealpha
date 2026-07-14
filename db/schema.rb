@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_12_000004) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_14_000001) do
   create_table "conversations", force: :cascade do |t|
     t.string "claude_session_id"
     t.datetime "created_at", null: false
@@ -50,6 +50,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_12_000004) do
     t.integer "estimated_price"
     t.integer "position"
     t.integer "project_id", null: false
+    t.json "tags", default: [], null: false
     t.string "title", null: false
     t.datetime "updated_at", null: false
     t.index ["conversation_id"], name: "index_tasks_on_conversation_id"

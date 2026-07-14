@@ -54,7 +54,7 @@ class TaskSync
         next if title.blank?
 
         if (existing = user_tasks[title]&.first)
-          # ユーザー編集済み: 見積もり(人日・価格・estimated_by)は保持し、説明とカテゴリだけ更新
+          # ユーザー編集済み: 見積もり(人日・価格・estimated_by)とタグは保持し、説明とカテゴリだけ更新
           existing.update!(
             description: attrs["description"],
             category: attrs["category"],
@@ -74,7 +74,8 @@ class TaskSync
             estimated_days: days,
             estimated_price: days ? (days * @project.daily_rate).round : nil,
             estimated_by: "llm",
-            position: index
+            position: index,
+            tags: sanitize_tags(attrs["tags"])
           )
         end
       end
@@ -82,5 +83,10 @@ class TaskSync
       # 新リストに対応が無くなったユーザー編集タスクも削除(洗い替え)
       @project.tasks.where(estimated_by: "user").where.not(id: matched_ids).destroy_all
     end
+  end
+
+  # LLM出力のタグを文字列配列に正規化する(不正要素は捨てる)
+  def sanitize_tags(raw)
+    Array(raw).grep(String).map(&:strip).reject(&:empty?).uniq.first(10)
   end
 end
