@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "Api::Tasks" do
+  before { sign_in(create(:user)) }
+
   describe "PATCH /api/tasks/:id" do
     let(:project) { create(:project, name: "案件") }
     let(:task) do

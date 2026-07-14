@@ -1,6 +1,19 @@
 require "rails_helper"
 
 RSpec.describe "Api::Projects" do
+  before { sign_in(create(:user)) }
+
+  describe "未ログインの場合" do
+    it "401 を返す" do
+      delete api_session_path # before のログインを打ち消す
+
+      get api_projects_path
+
+      expect(response).to have_http_status(:unauthorized)
+      expect(response.parsed_body["error"]).to be_present
+    end
+  end
+
   describe "GET /api/projects" do
     it "集計値つきの一覧を返す" do
       project = create(:project, name: "案件A", daily_rate: 60000)

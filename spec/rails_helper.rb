@@ -72,4 +72,7 @@ RSpec.configure do |config|
 
   # create(:project) のように FactoryBot. を省略して書けるようにする
   config.include FactoryBot::Syntax::Methods
+
+  # request spec で sign_in(user) を使えるようにする
+  config.include AuthHelpers, type: :request
 end

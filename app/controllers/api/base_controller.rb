@@ -1,7 +1,8 @@
 module Api
   class BaseController < ApplicationController
-    # API はブラウザのフォーム以外からもアクセスされるため CSRF 検証をスキップする
-    skip_before_action :verify_authenticity_token
+    # Cookie セッション認証のため CSRF 検証は有効のまま。
+    # フロント(lib/api.ts)は常に X-CSRF-Token を送信している。
+    include Authentication
 
     rescue_from ActiveRecord::RecordNotFound do
       render json: { error: "リソースが見つかりません" }, status: :not_found

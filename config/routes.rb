@@ -7,6 +7,8 @@ Rails.application.routes.draw do
   namespace :api do
     get "health", to: "health#show"
 
+    resource :session, only: [ :show, :create, :destroy ]
+
     resources :projects, only: [ :index, :show, :create, :update ] do
       resources :conversations, only: [ :create ]
     end

@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe "Api::Messages / Api::Conversations" do
+  before { sign_in(create(:user)) }
+
   let(:project) { create(:project, name: "案件") }
 
   describe "POST /api/projects/:id/conversations" do

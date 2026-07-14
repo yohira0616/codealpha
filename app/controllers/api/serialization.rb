@@ -3,6 +3,13 @@ module Api
   module Serialization
     private
 
+    def user_json(user)
+      {
+        id: user.id,
+        email_address: user.email_address
+      }
+    end
+
     def task_json(task)
       {
         id: task.id,

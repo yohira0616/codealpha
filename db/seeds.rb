@@ -7,3 +7,10 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+
+# ローカル開発用ユーザー(本番のユーザーは rails console で作成する)
+if Rails.env.development?
+  User.find_or_create_by!(email_address: "dev@example.com") do |user|
+    user.password = "password"
+  end
+end
