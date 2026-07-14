@@ -13,6 +13,7 @@ export interface UpdateTaskParams {
   category?: string;
   estimated_days?: number;
   estimated_price?: number;
+  tags?: string[];
 }
 
 // estimated_days か estimated_price を変更するとサーバー側で estimated_by が "user" になる

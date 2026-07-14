@@ -82,6 +82,8 @@ function ProjectDetail({ project }: { project: Project }) {
             tasks={project.tasks}
             totalDays={project.total_estimated_days}
             totalPrice={project.total_estimated_price}
+            inScopeDays={project.in_scope_estimated_days}
+            inScopePrice={project.in_scope_estimated_price}
           />
         </div>
       </div>

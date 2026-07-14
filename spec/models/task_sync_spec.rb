@@ -91,5 +91,25 @@ RSpec.describe TaskSync do
         expect(described_class.call(conversation:, text: fenced('{"tasks": "not array"}'))).to be(false)
       end
     end
+
+    context "tags が含まれる場合" do
+      it "正規化して保存する(不正要素・重複・空白は除去)" do
+        text = fenced('{"tasks": [{"title": "カレンダー連携", "estimated_days": 7, ' \
+                      '"tags": ["スコープ外", " 次期フェーズ ", "スコープ外", "", 123, null]}]}')
+
+        expect(described_class.call(conversation:, text:)).to be(true)
+        task = project.tasks.sole
+        expect(task.tags).to eq([ "スコープ外", "次期フェーズ" ])
+        expect(task.in_scope?).to be(false)
+      end
+
+      it "user 編集済みタスクのタグは洗い替えで上書きしない" do
+        create(:task, project:, title: "ログイン機能", estimated_by: "user", tags: [ "要確認" ])
+        text = fenced('{"tasks": [{"title": "ログイン機能", "estimated_days": 1.0, "tags": ["スコープ外"]}]}')
+
+        expect(described_class.call(conversation:, text:)).to be(true)
+        expect(project.tasks.sole.tags).to eq([ "要確認" ])
+      end
+    end
   end
 end

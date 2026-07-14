@@ -27,5 +27,24 @@ RSpec.describe "Api::Tasks" do
         expect(json).to include("title" => "改名", "estimated_by" => "llm")
       end
     end
+
+    context "tags を更新した場合" do
+      it "タグが保存され、estimated_by は変わらず、初期スコープ合計から除外される" do
+        patch api_task_path(task), params: { task: { tags: [ "スコープ外", "次期フェーズ" ] } }, as: :json
+
+        expect(response).to have_http_status(:ok)
+        json = response.parsed_body["task"]
+        expect(json).to include(
+          "tags" => [ "スコープ外", "次期フェーズ" ],
+          "estimated_by" => "llm"
+        )
+
+        get api_project_path(project)
+        project_json = response.parsed_body["project"]
+        expect(project_json["total_estimated_price"]).to eq(100000)
+        expect(project_json["in_scope_estimated_price"]).to eq(0)
+        expect(project_json["in_scope_estimated_days"]).to eq(0.0)
+      end
+    end
   end
 end

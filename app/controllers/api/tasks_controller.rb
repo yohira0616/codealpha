@@ -17,7 +17,7 @@ module Api
     private
 
     def task_params
-      params.expect(task: [ :title, :description, :category, :estimated_days, :estimated_price ])
+      params.expect(task: [ :title, :description, :category, :estimated_days, :estimated_price, tags: [] ])
     end
   end
 end
